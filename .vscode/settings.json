@@ -1,0 +1,5 @@
+{
+    "python.defaultInterpreterPath": "/home/tatsuro/.cache/pypoetry/virtualenvs/study-log-h5lKZ4xv-py3.8/bin/python",
+    "python.formatting.provider": "black",
+    "editor.formatOnSave": true
+}
