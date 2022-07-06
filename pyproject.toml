@@ -8,6 +8,9 @@ authors = ["piyota0901 <piyo.tatsu.0901@gmail.com>"]
 python = "^3.8"
 fastapi = "^0.78.0"
 uvicorn = {extras = ["standard"], version = "^0.18.2"}
+SQLAlchemy = "^1.4.39"
+isort = "^5.10.1"
+black = "^22.6.0"
 
 [tool.poetry.dev-dependencies]
 

@@ -96,3 +96,13 @@ No dependencies to install or update
   ```bash
   $ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
   ```
+
+### その他
+- isortの有効化
+  ```json
+  {
+    "editor.codeActionsOnSave": {
+          "source.organizeImports": true
+      }
+  }
+  ```

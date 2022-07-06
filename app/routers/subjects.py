@@ -1,26 +1,11 @@
+import sched
 import uuid
-from fastapi import APIRouter
+
+from app.db import cruds, schemas
+from app.db.database import get_db
+from fastapi import APIRouter, Depends
 from fastapi.encoders import jsonable_encoder
-from pydantic import BaseModel
-from pydantic import Field, UUID4
-from typing import List, Optional
-
-
-class SubjectCreate(BaseModel):
-    """サブジェクトの作成"""
-
-    name: str
-    description: Optional[str]
-    category: Optional[List[str]]
-
-
-class SubjectUpdate(BaseModel):
-    """サブジェクトの更新"""
-
-    name: Optional[str]
-    description: Optional[str]
-    category: Optional[List[str]]
-
+from sqlalchemy.orm import Session
 
 router = APIRouter(prefix="/subjects", tags=["subjects"])
 
@@ -29,25 +14,19 @@ fake_subject_db = {}
 
 
 @router.get("/list")
-def read_subjects():
+def read_subject_all(db: Session = Depends(get_db)):
     """全サブジェクトを返す"""
-    return fake_subject_db
+    return cruds.select_subject_all(db=db)
 
 
 @router.post("/create")
-def create_subject(subject: SubjectCreate):
+def create_subject(subject: schemas.SubjectCreate, db: Session = Depends(get_db)):
     """サブジェクトを作成する"""
-    fake_subject_db[str(uuid.uuid4())] = subject.dict()
-    return subject
+    return cruds.add_subject(subject=subject, db=db)
 
 
-@router.put("/update/{subject_id}", response_model=SubjectUpdate)
-def update_subject(subject_id: str, subject: SubjectUpdate):
-    """サブジェクトを更新する"""
-    org_subject_data = fake_subject_db[subject_id]
-    org_subject = SubjectCreate(**org_subject_data)
-
-    update_data = subject.dict(exclude_unset=True)
-    updated_subject = org_subject.copy(update=update_data)
-    fake_subject_db[subject_id] = jsonable_encoder(updated_subject)
-    return updated_subject
+@router.put("/update/{subject_id}", response_model=schemas.SubjectUpdate)
+def update_subject(
+    subject_id: str, subject: schemas.SubjectUpdate, db: Session = Depends(get_db)
+):
+    return cruds.update_subject(subject_id=subject_id, subject=subject, db=db)

@@ -1,5 +1,12 @@
 {
     "python.defaultInterpreterPath": "/home/tatsuro/.cache/pypoetry/virtualenvs/study-log-h5lKZ4xv-py3.8/bin/python",
+    "autoDocstring.docstringFormat": "google",
+
+    // linging
+    "python.linting.enabled": true,
     "python.formatting.provider": "black",
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": true
+    }
 }
