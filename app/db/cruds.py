@@ -74,3 +74,16 @@ def update_subject(
     db.flush(db_subject)
 
     return db_subject
+
+
+def delete_subject(subject_id: str, db: Session) -> None:
+    """サブジェクトを削除する
+
+    Args:
+        subject_id (str): _description_
+    """
+    db_subject = select_subject_by_id(subject_id=subject_id, db=db)
+
+    db.delete(db_subject)
+    db.commit()
+    return None

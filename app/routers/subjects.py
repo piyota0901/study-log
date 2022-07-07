@@ -28,4 +28,25 @@ def create_subject(subject: schemas.SubjectCreate, db: Session = Depends(get_db)
 def update_subject(
     subject_id: str, subject: schemas.SubjectUpdate, db: Session = Depends(get_db)
 ):
+    """サブジェクトを更新する
+
+    Args:
+        subject_id (str): サブジェクトID
+        subject (schemas.SubjectUpdate): _description_
+        db (Session, optional): _description_. Defaults to Depends(get_db).
+
+    Returns:
+        _type_: _description_
+    """
     return cruds.update_subject(subject_id=subject_id, subject=subject, db=db)
+
+
+@router.delete("/delete/{subject_id}")
+def delete_subject(subject_id: str, db: Session = Depends(get_db)):
+    """サブジェクトを削除する
+
+    Args:
+        subject_id (str): _description_
+        db (Session, optional): _description_. Defaults to Depends(get_db).
+    """
+    return cruds.delete_subject(subject_id=subject_id, db=db)
