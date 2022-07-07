@@ -18,6 +18,18 @@ def select_subject_all(db: Session) -> List[schemas.Subject]:
     return db.query(models.Subject).all()
 
 
+def select_subject_by_id(subject_id: str, db: Session) -> schemas.Subject:
+    """指定IDのsubjectを取得する
+
+    Args:
+        db (Session): _description_
+
+    Returns:
+        schemas.Subject: _description_
+    """
+    return db.query(models.Subject).filter_by(id=subject_id).first()
+
+
 def add_subject(subject: schemas.SubjectCreate, db: Session) -> schemas.Subject:
     """subjectを登録する
 
@@ -53,21 +65,12 @@ def update_subject(
     Returns:
         schemas.Subject: _description_
     """
+    db_subject = select_subject_by_id(subject_id=subject_id, db=db)
     update_data = subject.dict(exclude_unset=True)
-    print(update_data)
-    obj = (
-        db.query(models.Subject)
-        .filter(models.Subject.id == subject_id)
-        .update(update_data)
-    )
-    print(obj)
-    # print("orm_subject: ", orm_subject)
-    # org_subject = schemas.Subject.from_orm(orm_subject)
-    # print("subject: ", org_subject)
-
-    # update_subject = org_subject.copy(update=update_data)
-    # print("update subject: ", update_subject)
-
+    for key, value in update_data.items():
+        setattr(db_subject, key, value)
     # 更新
     db.commit()
-    return obj
+    db.flush(db_subject)
+
+    return db_subject

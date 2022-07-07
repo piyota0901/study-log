@@ -106,3 +106,12 @@ No dependencies to install or update
       }
   }
   ```
+- sqlalchemyのUpdate
+  - propertyを書き換える
+  - settarr()が便利
+    - https://github.com/tiangolo/fastapi/discussions/2561
+    ```python
+    update_data = updates.dict(exclude_unset=True)
+    for key, value in update_data.items():
+      setattr(item, key, value)
+    ```
