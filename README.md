@@ -115,3 +115,82 @@ No dependencies to install or update
     for key, value in update_data.items():
       setattr(item, key, value)
     ```
+
+### JWT
+
+- 有効期限(expire)は、`jwt.decode`時に検証される
+- `jose.exceptions.ExpiredSignatureError: Signature has expired`エラーがスローされる
+```bash
+>>> from jose import jwt
+>>> import datetime
+>>> datetime.datetime.now()
+datetime.datetime(2022, 7, 12, 21, 51, 3, 524089)
+>>> datetime.datetime.utcnow()
+datetime.datetime(2022, 7, 12, 12, 51, 17, 210806)
+>>> to_encode = {"sub":"sample", "exp": datetime.utcnow()}
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+AttributeError: module 'datetime' has no attribute 'utcnow'
+>>> to_encode = {"sub":"sample", "exp": datetime.datetime.utcnow()}
+>>> jwt.encode(to_encode, "secret", algorithm="HS256")
+'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzYW1wbGUiLCJleHAiOjE2NTc2MzA5MjR9._zjLE3vw1J4aikvagwK-wyd9GOKcAihKYoAsb2GKBYQ'
+>>> token = jwt.encode(to_encode, "secret", algorithm="HS256")
+>>> jwt.decode(token, "secret", algorithms="HS256")
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "/home/tatsuro/.cache/pypoetry/virtualenvs/study-log-h5lKZ4xv-py3.8/lib/python3.8/site-packages/jose/jwt.py", line 157, in decode
+    _validate_claims(
+  File "/home/tatsuro/.cache/pypoetry/virtualenvs/study-log-h5lKZ4xv-py3.8/lib/python3.8/site-packages/jose/jwt.py", line 481, in _validate_claims
+    _validate_exp(claims, leeway=leeway)
+  File "/home/tatsuro/.cache/pypoetry/virtualenvs/study-log-h5lKZ4xv-py3.8/lib/python3.8/site-packages/jose/jwt.py", line 314, in _validate_exp
+    raise ExpiredSignatureError("Signature has expired.")
+jose.exceptions.ExpiredSignatureError: Signature has expired.
+>>> 
+```
+- jwt(ジョット)
+  - pythonだとjose（fastapi情報）
+  - https://pyjwt.readthedocs.io/en/latest/usage.html
+  - https://pyjwt.readthedocs.io/en/latest/api.html
+  - Header.Payload.署名の3情報をつなげた文字列
+    - Header
+      - JSON文字列
+        ```json
+        {
+          "typ": "JWT",
+          "alg": "HS256"
+        }
+        ```
+      - joseでは気にしなくてよい。自動的に設定される.
+    - Payload(クレーム)
+      - 任意のデータを含むJSON文字列
+      - 予約済みのキー
+        - "iss" (Issuer) Claim
+        - "sub" (Subject) Claim
+        - "aud" (Audience) Claim
+        - "exp" (Expiration Time) Claim
+        - "nbf" (Not Before) Claim
+        - "iat" (Issued At) Claim
+        - "jti" (JWT ID) Claim
+      - 必ずしも使用する必要はない
+      - "exp"
+        - joseではencode時にexpを検証してくれる
+          - `verify_exp`パラメータでoffにもできる
+      - "iss"
+        ```python
+        payload = {"some": "payload", "iss": "urn:foo"}
+
+        token = jwt.encode(payload, "secret")
+        decoded = jwt.decode(token, "secret", issuer="urn:foo", algorithms=["HS256"])
+        ```
+        ※issuerが正しくない場合、jwt.InvalidIssuerErrorがスローされる
+  - claimを必須にする方法
+    ```
+    Requiring Presence of Claims
+    If you wish to require one or more claims to be present in the claimset,  you can set the require parameter to include these claims. 
+    ```
+    ```python
+    >>> jwt.decode(encoded, options={"require": ["exp", "iss", "sub"]})
+    {'exp': 1371720939, 'iss': 'urn:foo', 'sub': '25c37522-f148-4cbf-8ee6-c4a9718dd0af'}
+    ```
+- role base access control
+  - https://github.com/vineetkarandikar/aws-samples/blob/main/auth.py

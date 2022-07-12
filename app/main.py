@@ -3,7 +3,7 @@ from typing import Union
 
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from jose import JWSError, jwt
+from jose import JWSError, JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel
 
@@ -79,6 +79,7 @@ def authenticate_user(fake_db, username: str, password: str):
 
 
 def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None):
+    print("data: ", data)
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
