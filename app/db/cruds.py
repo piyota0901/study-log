@@ -1,89 +1,86 @@
 from typing import List
-from unicodedata import category
 from uuid import uuid4
 
 from app.db import models, schemas
 from sqlalchemy.orm import Session
 
 
-def select_subject_all(db: Session) -> List[schemas.Subject]:
-    """全subjectを取得する
+def select_task_all(db: Session) -> List[schemas.Task]:
+    """全taskを取得する
 
     Args:
         db (Session): dbセッション
 
     Returns:
-        List[schemas.Subject]: サブジェクト
+        List[schemas.Task]: タスク
     """
-    return db.query(models.Subject).all()
+    return db.query(models.task).all()
 
 
-def select_subject_by_id(subject_id: str, db: Session) -> schemas.Subject:
-    """指定IDのsubjectを取得する
+def select_task_by_id(task_id: str, db: Session) -> schemas.Task:
+    """指定IDのtaskを取得する
 
     Args:
         db (Session): _description_
 
     Returns:
-        schemas.Subject: _description_
+        schemas.Task: _description_
     """
-    return db.query(models.Subject).filter_by(id=subject_id).first()
+    return db.query(models.task).filter_by(id=task_id).first()
 
 
-def add_subject(subject: schemas.SubjectCreate, db: Session) -> schemas.Subject:
-    """subjectを登録する
+def add_task(task: schemas.TaskCreate, db: Session) -> schemas.Task:
+    """taskを登録する
 
     Args:
-        subject (schemas.SubjectCreate): subject
+        task (schemas.TaskCreate): task
         db (Session): dbセッション
 
     Returns:
-        schemas.Subject: サブジェクト
+        schemas.Task: タスク
     """
-    new_subject = models.Subject(
+    new_task = models.task(
         id=str(uuid4()),
-        name=subject.name,
-        category=subject.category,
+        name=task.name,
+        category=task.category,
     )
 
-    db.add(new_subject)
+    db.add(new_task)
     db.commit()
-    db.refresh(new_subject)
+    db.refresh(new_task)
 
-    return db.query(models.Subject).filter_by(id=new_subject.id).first()
+    return db.query(models.Task).filter_by(id=new_task.id).first()
 
 
-def update_subject(
-    subject_id: str, subject: schemas.SubjectUpdate, db: Session
-) -> schemas.Subject:
-    """サブジェクトを更新する
+def update_task(task_id: str, task: schemas.TaskUpdate, db: Session) -> schemas.Task:
+    """タスクを更新する
 
     Args:
-        subject_id (str): _description_
+        task_id (str): _description_
         db (Session): _description_
 
     Returns:
-        schemas.Subject: _description_
+        schemas.Task: _description_
     """
-    db_subject = select_subject_by_id(subject_id=subject_id, db=db)
-    update_data = subject.dict(exclude_unset=True)
+    db_task = select_task_by_id(task_id=task_id, db=db)
+    update_data = task.dict(exclude_unset=True)
     for key, value in update_data.items():
-        setattr(db_subject, key, value)
+        setattr(db_task, key, value)
     # 更新
     db.commit()
-    db.flush(db_subject)
+    db.flush(db_task)
 
-    return db_subject
+    return db_task
 
 
-def delete_subject(subject_id: str, db: Session) -> None:
-    """サブジェクトを削除する
+def delete_task(task_id: str, db: Session) -> None:
+    """タスクを削除する
 
     Args:
-        subject_id (str): _description_
+        task_id (str): _description_
     """
-    db_subject = select_subject_by_id(subject_id=subject_id, db=db)
+    db_task = select_task_by_id(task_id=task_id, db=db)
 
-    db.delete(db_subject)
+    db.delete(db_task)
     db.commit()
     return None

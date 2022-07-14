@@ -3,7 +3,7 @@ from .models import Base
 
 
 def initialize_db():
-    Base.metadata.create_all(bind=engine)
+    Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine, checkfirst=True)
 
 
